@@ -1,0 +1,5 @@
+# terraform.tfvars로 복사해서 쓴다.
+# create_github_oidc_provider = false   # 계정에 이미 공급자가 있을 때
+infra_apply_policy_arns = [
+  # 0002 결정 전까지는 비워 두면 apply 역할이 아무 권한도 갖지 않는다.
+]
