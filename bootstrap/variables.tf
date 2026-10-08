@@ -1,7 +1,7 @@
 variable "region" {
   description = "state 버킷을 둘 AWS 리전"
   type        = string
-  default     = "ap-northeast-1"
+  default     = "ap-northeast-2"
 }
 
 variable "name_prefix" {
