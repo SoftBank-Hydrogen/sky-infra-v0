@@ -8,7 +8,7 @@ variable "environment" {
 }
 
 variable "contract_version" {
-  description = "docs/outputs-contract.md의 계약 버전"
+  description = "출력값 계약 버전"
   type        = number
 }
 

@@ -33,12 +33,16 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
       - run: terraform fmt -check -recursive
+      - name: Unit test plan checker
+        run: python3 -m unittest discover -s scripts
       - name: validate
         run: |
           for dir in bootstrap envs/dev; do
             terraform -chdir="$dir" init -backend=false -input=false
             terraform -chdir="$dir" validate
           done
+      - name: First plan with mock provider
+        run: terraform -chdir=envs/dev test
 
   plan:
     # 역할이 만들어지고 저장소 변수가 설정된 뒤부터 동작한다.
@@ -68,6 +72,7 @@ jobs:
         working-directory: envs/dev
         env:
           TF_VAR_infra_apply_policy_arns: ${{ vars.INFRA_APPLY_POLICY_ARNS || '[]' }}
+          TF_VAR_aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
         run: |
           printf 'bucket="%s"\nkey="envs/dev/terraform.tfstate"\nregion="%s"\nencrypt=true\nuse_lockfile=true\n' \
             "${{ vars.TF_STATE_BUCKET }}" "${{ vars.AWS_REGION }}" > backend.hcl
@@ -103,6 +108,7 @@ jobs:
         working-directory: envs/${{ github.event.inputs.environment }}
         env:
           TF_VAR_infra_apply_policy_arns: ${{ vars.INFRA_APPLY_POLICY_ARNS }}
+          TF_VAR_aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
         run: |
           env_name="${{ github.event.inputs.environment }}"
           printf 'bucket="%s"\nkey="envs/%s/terraform.tfstate"\nregion="%s"\nencrypt=true\nuse_lockfile=true\n' \
