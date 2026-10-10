@@ -525,6 +525,7 @@ data "aws_iam_policy_document" "github_deploy" {
   statement {
     sid = "PushPlatformImage"
     actions = [
+      "ecr:DescribeRepositories",
       "ecr:BatchCheckLayerAvailability",
       "ecr:InitiateLayerUpload",
       "ecr:UploadLayerPart",

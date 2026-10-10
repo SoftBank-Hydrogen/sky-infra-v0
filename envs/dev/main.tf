@@ -55,10 +55,11 @@ module "github_oidc" {
       subjects            = ["repo:${local.org}/sky-infra:environment:${local.environment}"]
       managed_policy_arns = var.infra_apply_policy_arns
     }
-    # sky-platform main 브랜치에서 서비스 서버 이미지를 ECR에 push만 한다.
+    # sky-platform CI uses environment:dev and GitHub immutable repository IDs.
+    # Restrict dev deployments to main through GitHub environment branch rules.
     platform-deploy = {
       description = "sky-platform image push to ECR"
-      subjects    = ["repo:${local.org}/sky-platform:ref:refs/heads/main"]
+      subjects    = ["${var.platform_oidc_subject_prefix}:environment:${local.environment}"]
     }
     # sky-infra main에서 platform-image.auto.tfvars가 바뀌면 태스크 정의와 ECS 서비스만 적용한다.
     # job에 environment를 걸면 sub가 environment:로 바뀌어 assume되지 않는다.
