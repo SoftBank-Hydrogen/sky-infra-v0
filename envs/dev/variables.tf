@@ -18,6 +18,17 @@ variable "github_org" {
   default = "SoftBank-Hydrogen"
 }
 
+variable "platform_oidc_subject_prefix" {
+  description = "GitHub sky-platform OIDC sub_claim_prefix, including immutable owner/repository IDs"
+  type        = string
+  default     = "repo:SoftBank-Hydrogen@338183202/sky-platform@1407769237"
+
+  validation {
+    condition     = can(regex("^repo:[A-Za-z0-9_.-]+@[0-9]+/[A-Za-z0-9_.-]+@[0-9]+$", var.platform_oidc_subject_prefix))
+    error_message = "Use the immutable repo:owner@ID/repository@ID prefix returned by GitHub OIDC customization."
+  }
+}
+
 variable "create_github_oidc_provider" {
   description = "계정에 GitHub OIDC 공급자가 이미 있으면 false"
   type        = bool
