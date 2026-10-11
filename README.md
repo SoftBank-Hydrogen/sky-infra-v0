@@ -27,10 +27,11 @@ Terraform 1.10 이상이 필요하며, CI는 1.15.8을 사용합니다. 새 작�
 
 | 경로 | 용도 | 현재 상태 |
 | --- | --- | --- |
-| `bootstrap/` | 공용 Terraform state용 S3 버킷 | 코드만 있음, 미적용 |
-| `envs/dev/` | 개발 환경의 GitHub OIDC 역할·SSM 출력값 | 코드만 있음, 미적용 |
-| `modules/aws/` | OIDC 역할과 공개 출력값 모듈 | 구현됨 |
+| `bootstrap/` | 공용 Terraform state용 S3 버킷 | 적용됨 |
+| `envs/dev/` | 개발 환경: GitHub OIDC 역할, SSM 출력값, 서비스 서버(Sky) A안 | 적용됨 (테스트 이미지로 ALB·Cognito 확인) |
+| `modules/aws/` | OIDC 역할, 공개 출력값, 서비스 서버(network·edge·ecr·secrets·iam·ecs·observability) | 구현됨 |
 | `.github/workflows/terraform.yml` | 정적 검사, 역할 설정 후 plan·apply | 정적 검사만 사용 가능 |
+| `.github/workflows/platform-image.yml` | 서비스 서버 이미지 SHA 변경만 자동 배포 | 역할·변수 설정 전 |
 
 실제 Sky 배포는 `ap-northeast-2`에서 동작합니다. Terraform 예시의 기본 리전도 여기에
 맞췄습니다. 현재 플랫폼은 SSM 출력값을 자동으로 읽거나 Terraform의 배포 역할을 위임받지

@@ -72,8 +72,8 @@ resource "aws_iam_role_policy_attachment" "managed" {
 }
 
 resource "aws_iam_role_policy" "inline" {
-  for_each = { for role, cfg in var.roles : role => cfg if cfg.inline_policy_json != null }
+  for_each = var.inline_policies
   name     = "${var.name_prefix}-${each.key}"
   role     = aws_iam_role.this[each.key].id
-  policy   = each.value.inline_policy_json
+  policy   = each.value
 }

@@ -1,6 +1,6 @@
 # Terraform state 저장소. 계정마다 한 번만 적용한다.
 # 이 루트의 state는 로컬 파일로 남는다(닭과 달걀 문제). 적용 후 state 파일은
-# 저장소에 커밋하지 않고, 버킷 이름만 docs/runbooks/bootstrap.md 절차대로 기록한다.
+# 저장소에 커밋하지 않는다.
 
 terraform {
   required_version = ">= 1.10.0" # S3 네이티브 잠금(use_lockfile)

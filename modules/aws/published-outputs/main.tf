@@ -1,5 +1,5 @@
 # sky-platform에 넘기는 값을 SSM Parameter Store에 기록한다.
-# 키 목록과 의미는 docs/outputs-contract.md가 기준이다. 여기 없는 키를 플랫폼이 읽으면 안 된다.
+# 여기 없는 키를 플랫폼이 읽으면 안 된다.
 
 terraform {
   required_providers {
