@@ -21,6 +21,9 @@ locals {
   log_group_arn      = "arn:${local.partition}:logs:${local.region}:${local.account}:log-group:${var.log_group_name}"
   exec_log_group_arn = "arn:${local.partition}:logs:${local.region}:${local.account}:log-group:${var.exec_log_group_name}"
 
+  # Reuse the permissions boundary owned by the active sky-infra repository.
+  managed_boundary_arn = "arn:${local.partition}:iam::${local.account}:policy/${var.name_prefix}-deployed-app-boundary"
+
   managed_role_arns = [
     "arn:${local.partition}:iam::${local.account}:role/sky-core-*",
     "arn:${local.partition}:iam::${local.account}:role/sky-db-*",
@@ -407,13 +410,11 @@ data "aws_iam_policy_document" "task_iam" {
   statement {
     sid = "ManagedRoles"
     actions = [
-      "iam:CreateRole",
       "iam:DeleteRole",
       "iam:GetRole",
       "iam:TagRole",
       "iam:UntagRole",
       "iam:ListRoleTags",
-      "iam:PutRolePolicy",
       "iam:GetRolePolicy",
       "iam:DeleteRolePolicy",
       "iam:ListRolePolicies",
@@ -424,6 +425,16 @@ data "aws_iam_policy_document" "task_iam" {
     resources = local.managed_role_arns
   }
   statement {
+    sid       = "WriteManagedRolesWithBoundaryOnly"
+    actions   = ["iam:CreateRole", "iam:PutRolePolicy", "iam:PutRolePermissionsBoundary"]
+    resources = local.managed_role_arns
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PermissionsBoundary"
+      values   = [local.managed_boundary_arn]
+    }
+  }
+  statement {
     sid       = "AttachKnownPoliciesOnly"
     actions   = ["iam:AttachRolePolicy"]
     resources = local.managed_role_arns
@@ -431,6 +442,11 @@ data "aws_iam_policy_document" "task_iam" {
       test     = "ArnEquals"
       variable = "iam:PolicyARN"
       values   = local.attachable_policy_arns
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PermissionsBoundary"
+      values   = [local.managed_boundary_arn]
     }
   }
   statement {

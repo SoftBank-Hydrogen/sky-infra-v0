@@ -23,8 +23,30 @@ env:
   CONTAINER_NAME: sky-platform
 
 jobs:
+  scope:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      image_only: ${{ steps.scope.outputs.image_only }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Classify image-only changes without AWS credentials
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          arguments=("$BASE_SHA" "$HEAD_SHA")
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then arguments+=(--pull-request); fi
+          python3 scripts/platform_image_scope.py "${arguments[@]}" >> "$GITHUB_OUTPUT"
+
   plan:
-    if: github.event_name == 'pull_request'
+    needs: scope
+    if: github.event_name == 'pull_request' && needs.scope.outputs.image_only == 'true' && vars.AWS_PLAN_ROLE_ARN != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -160,7 +182,8 @@ jobs:
         run: exit 1
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: scope
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.scope.outputs.image_only == 'true' && vars.AWS_PLATFORM_RELEASE_ROLE_ARN != ''
     runs-on: ubuntu-latest
     # environment를 걸지 않는다. 걸면 OIDC sub가 environment:dev로 바뀌어 main 전용 역할을 assume하지 못한다.
     concurrency:

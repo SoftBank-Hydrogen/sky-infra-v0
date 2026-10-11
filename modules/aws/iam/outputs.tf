@@ -23,3 +23,8 @@ output "platform_release_policy_json" {
   description = "github-oidc 모듈의 sky-infra 이미지 배포 역할에 넣는 인라인 정책"
   value       = data.aws_iam_policy_document.platform_release.json
 }
+
+output "deployed_app_boundary_arn" {
+  description = "Required existing boundary managed by active sky-infra; legacy deployment fails closed without it."
+  value       = local.managed_boundary_arn
+}

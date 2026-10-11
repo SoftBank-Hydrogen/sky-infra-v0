@@ -153,8 +153,9 @@ module "ecs" {
   exec_log_group_name   = module.observability.exec_log_group_name
 
   environment = {
-    SKY_AWS_REGION     = var.region
-    SKY_AWS_ACCOUNT_ID = var.aws_account_id
+    SKY_AWS_REGION            = var.region
+    SKY_AWS_ACCOUNT_ID        = var.aws_account_id
+    SKY_AWS_ROLE_BOUNDARY_ARN = module.iam.deployed_app_boundary_arn
   }
   secrets = {
     OPENAI_API_KEY              = module.secrets.secret_arns["openai-api-key"]

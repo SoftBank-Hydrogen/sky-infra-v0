@@ -25,4 +25,8 @@ variables {
 
 run "first_plan" {
   command = plan
+  assert {
+    condition     = module.iam.deployed_app_boundary_arn == "arn:aws:iam::123456789012:policy/sky-dev-deployed-app-boundary"
+    error_message = "Legacy deployments must reference the active repository's managed application boundary."
+  }
 }
